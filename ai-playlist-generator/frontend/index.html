@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Playlist Generator</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" fill="#1DB954"/>
+          <path d="M7 9.5C9.5 8.5 14 8.5 17 10M6.5 12.5C9.5 11 14.5 11 18 13M8 15.5C10.5 14.5 13.5 14.5 16 16"
+                stroke="#000" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <span class="logo-text">AI<span class="accent">Playlist</span></span>
+      </div>
+      <p class="tagline">Natural language &rarr; AI agent &rarr; Perfect playlist</p>
+    </div>
+  </header>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main">
+
+    <!-- INPUT SECTION -->
+    <section class="input-section">
+      <div class="input-card">
+        <label class="input-label">What playlist do you want?</label>
+        <div class="input-row">
+          <textarea
+            id="queryInput"
+            class="query-input"
+            placeholder="e.g. Make me a birthday playlist from every year since 1985"
+            rows="2"
+            maxlength="300"
+          ></textarea>
+          <button id="generateBtn" class="generate-btn" onclick="generatePlaylist()">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Generate
+          </button>
+        </div>
+        <div class="example-prompts">
+          <span class="example-label">Try:</span>
+          <button class="pill" onclick="fillExample(this)">Birthday playlist from every year since 1985</button>
+          <button class="pill" onclick="fillExample(this)">Workout bangers from the 2010s</button>
+          <button class="pill" onclick="fillExample(this)">Chill R&amp;B songs for a late night drive</button>
+          <button class="pill" onclick="fillExample(this)">Happy pop hits from 2000 to 2010</button>
+          <button class="pill" onclick="fillExample(this)">Sad songs from every year since 2015</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESULTS GRID (hidden until first request) -->
+    <section class="results-grid" id="resultsGrid" style="display:none;">
+
+      <!-- LEFT: Workflow Steps -->
+      <div class="panel workflow-panel">
+        <div class="panel-header">
+          <svg class="panel-icon" viewBox="0 0 24 24" fill="none">
+            <path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  stroke="#1DB954" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <h2>Agent Workflow</h2>
+          <span class="badge" id="workflowBadge">Running…</span>
+        </div>
+
+        <ol class="workflow-steps" id="workflowSteps">
+          <li class="step" id="step-1" data-step="1">
+            <div class="step-header">
+              <span class="step-indicator"><span class="step-num">1</span></span>
+              <div class="step-meta">
+                <span class="step-name">Intent Understanding</span>
+                <span class="step-sub">Parse natural-language request</span>
+              </div>
+              <span class="step-status pending">pending</span>
+            </div>
+            <div class="step-output" id="output-1"></div>
+          </li>
+          <li class="step" id="step-2" data-step="2">
+            <div class="step-header">
+              <span class="step-indicator"><span class="step-num">2</span></span>
+              <div class="step-meta">
+                <span class="step-name">Task Planning</span>
+                <span class="step-sub">Design execution strategy</span>
+              </div>
+              <span class="step-status pending">pending</span>
+            </div>
+            <div class="step-output" id="output-2"></div>
+          </li>
+          <li class="step" id="step-3" data-step="3">
+            <div class="step-header">
+              <span class="step-indicator"><span class="step-num">3</span></span>
+              <div class="step-meta">
+                <span class="step-name">Data Retrieval</span>
+                <span class="step-sub">Search local song catalog</span>
+              </div>
+              <span class="step-status pending">pending</span>
+            </div>
+            <div class="step-output" id="output-3"></div>
+          </li>
+          <li class="step" id="step-4" data-step="4">
+            <div class="step-header">
+              <span class="step-indicator"><span class="step-num">4</span></span>
+              <div class="step-meta">
+                <span class="step-name">Playlist Assembly</span>
+                <span class="step-sub">Select and order tracks</span>
+              </div>
+              <span class="step-status pending">pending</span>
+            </div>
+            <div class="step-output" id="output-4"></div>
+          </li>
+          <li class="step" id="step-5" data-step="5">
+            <div class="step-header">
+              <span class="step-indicator"><span class="step-num">5</span></span>
+              <div class="step-meta">
+                <span class="step-name">Final Output</span>
+                <span class="step-sub">Package and return results</span>
+              </div>
+              <span class="step-status pending">pending</span>
+            </div>
+            <div class="step-output" id="output-5"></div>
+          </li>
+        </ol>
+      </div>
+
+      <!-- RIGHT: Playlist Results -->
+      <div class="panel playlist-panel">
+        <div class="panel-header">
+          <svg class="panel-icon" viewBox="0 0 24 24" fill="none">
+            <path d="M9 19V6l12-3v13M9 19a2 2 0 01-4 0 2 2 0 014 0zm12 0a2 2 0 01-4 0 2 2 0 014 0z"
+                  stroke="#1DB954" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <h2 id="playlistName">Playlist</h2>
+          <span class="badge" id="trackCount"></span>
+        </div>
+        <p class="playlist-desc" id="playlistDesc"></p>
+
+        <div class="track-list" id="trackList">
+          <div class="loading-tracks">
+            <div class="spinner"></div>
+            <span>Generating your playlist…</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- AUDIT LOG -->
+    <section class="audit-section" id="auditSection" style="display:none;">
+      <div class="panel audit-panel">
+        <div class="panel-header">
+          <svg class="panel-icon" viewBox="0 0 24 24" fill="none">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  stroke="#1DB954" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <h2>Execution Audit Log</h2>
+          <button class="toggle-log-btn" id="toggleLogBtn" onclick="toggleLog()">Hide</button>
+        </div>
+        <div class="log-body" id="logBody"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <p>AI Playlist Generator &mdash; v1 prototype &mdash; mock catalog only &mdash; no real Spotify connection</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
